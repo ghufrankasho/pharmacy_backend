@@ -14,7 +14,7 @@ return [
     */
 
     'defaults' => [
-        'guard' => 'warehouse',
+        'guard' => 'web',
         'passwords' => 'users',
     ],
 
@@ -35,23 +35,12 @@ return [
     |
     */
 
-'guards' => [
-    'user' => [
-        'driver' => 'jwt', // Use JWT for users
-        'provider' => 'users',
+    'guards' => [
+        'web' => [
+            'driver' => 'session',
+            'provider' => 'users',
+        ],
     ],
-    'pharmacy' => [
-        'driver' => 'jwt', // Use JWT for pharmacies
-        'provider' => 'pharmacies',
-    ],
-    'warehouse' => [
-        'driver' => 'jwt', // Use JWT for warehouse (web)
-        'provider' => 'warehouses',
-    ],
-],
-
-
-
 
     /*
     |--------------------------------------------------------------------------
@@ -70,20 +59,17 @@ return [
     |
     */
 
-  'providers' => [
-    'users' => [
-        'driver' => 'eloquent',
-        'model' => App\Models\User::class,
+    'providers' => [
+        'users' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\User::class,
+        ],
+
+        // 'users' => [
+        //     'driver' => 'database',
+        //     'table' => 'users',
+        // ],
     ],
-    'pharmacies' => [
-        'driver' => 'eloquent',
-        'model' => App\Models\Pharmacy::class,
-    ],
-    'warehouses' => [
-        'driver' => 'eloquent',
-        'model' => App\Models\Warehouse::class,
-    ],
-],
 
     /*
     |--------------------------------------------------------------------------

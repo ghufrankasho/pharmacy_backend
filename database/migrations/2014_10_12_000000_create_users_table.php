@@ -14,22 +14,22 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('type');
-            $table->string('phone')->default(null);
-            $table->string('address')->default(null);
+            $table->string('type')->default("warehouse");
+            $table->string('phone')->default('123456789');
+            $table->string('address')->default("aleppo");
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
-        });
-    }
+});
+}
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::dropIfExists('users');
-    }
+/**
+* Reverse the migrations.
+*/
+public function down(): void
+{
+Schema::dropIfExists('users');
+}
 };

@@ -25,6 +25,10 @@ class Warehouse extends Authenticatable implements JWTSubject
         'phone',
         'address'
     ];
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
     public function medicines(){
 
         return $this->hasMany(Medicine::class);
