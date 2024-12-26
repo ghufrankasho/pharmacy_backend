@@ -12,7 +12,7 @@ class Medicine extends Model
         'name',
         'warehouse_id',
         'calssification',
-        'photo',
+       
        
     ];
     public function warehouse(){

@@ -4,6 +4,8 @@ use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\MedicineController;
+use App\Http\Controllers\WarehouseController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,6 +28,39 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/profile', [AuthController::class, 'profile']);
 });
+
+Route::group(['middleware'=>'auth:warehouse','prefix'=>'warehouse'],function($router){ 
+    //medicine
+    Route::post('/medicine/add',[MedicineController::class,'store']);
+    Route::get('/medicine/{id}',[MedicineController::class,'show']);
+    Route::post('/medicine',[MedicineController::class,'update']);
+    Route::delete('/medicine/{id}',[MedicineController::class,'destroy']);
+   });
+
+   Route::group(['middleware'=>'auth:pharmacy','prefix'=>'pharmacy'],function($router){ 
+    //medicine
+    Route::post('/medicine',[MedicineController::class,'search']);
+    Route::get('/medicine/{id}',[MedicineController::class,'show']);
+    
+     //warehouse
+     Route::get('/warehouse',[WarehouseController::class,'index']);
+     Route::get('/warehouse/{id}',[WarehouseController::class,'show']);
+     
+   });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Route::get('/view-clear', function() {
     $exitCode = Artisan::call('cache:clear');
     $exitCode = Artisan::call('view:clear');

@@ -23,7 +23,8 @@ class Warehouse extends Authenticatable implements JWTSubject
         'email',
         'password',
         'phone',
-        'address'
+        'address',
+        'type'
     ];
     protected $hidden = [
         'password',

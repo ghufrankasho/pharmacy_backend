@@ -11,93 +11,309 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Hash;
 class WarehouseController extends Controller
 {
-    // public function __construct(){
-    //     $this->middleware('auth:warehouse',['except'=>['register','login','logout']]);
-    // }
-    public function index(){
-        return "fff";
+    public function store(Request $request){
         
-    }
-    public function register(Request $request)  {
-        return "hhhhhhhhhhhhhh";
-        $validator=Validator::make($request->all(),[
-            'name'=>'required',
-            'email'=>'required|string|email|unique:warehouses',
-            'password'=>'required|string|confirmed|min:6'
-        ]);
-        if($validator->failed()){
-            return response()->json([
-                'status' => false,
-                'message' => 'validation error',
-                'errors' => $validator->errors()
-            ], 400);
-        }
-        $warehouse=warehouse::create(array_merge(
-            $validator->validated(),
-            ['password'=>bcrypt($request->password)]
-        ));
-
-
-
-        return response()->json(
-           [ 'message'=>'تم الدخول بنجاح',
-             'user'=>$warehouse  
-            ],201);
-        
-    }
-    public function login(Request $request)  {
-      
-        $validator=Validator::make($request->all(),[
-            'email'=>'required|email',
-            'password'=>'required|string|min:6']);
-            
-        if($validator->failed()){
-            return response()->json([
-                'status' => false,
-                'message' => 'خطأ في التحقق',
-                'errors' => $validator->errors()
-            ], 422);
-            }
-        $warehouse=warehouse::where('email',$request->email)->first();
-        if($warehouse) {
-                 
-            if(Hash::check($request->password, $warehouse->password)){
-                $token=auth()->attempt($validator->validated());
-                return $this->createNewToken($token);}
-            else{
+        try{
+            $validateWarehouse = Validator::make($request->all(), 
+            [
+                'link' => 'url:http,https|required',
+                'id' => 'required|in:1,2,3,4,5',
+                'visible'=>'bool',
+                'alt'=>'string',
+                'expire_date'=>'date',
+                'image' => 'file|required|mimeids:image/jpeg,image/png,image/gif,image/svg+xml,image/webp,application/wbmp',
+            ]);
+            $validateWarehouse->sometimes('image', 'required|mimeids:image/vnd.wap.wbmp', function ($input) {
+                  return $input->file('image') !== null && $input->file('image')->getClientOriginalExtension() === 'wbmp';
+            });
+            if($validateWarehouse->fails()){
                 return response()->json([
                     'status' => false,
-                    'message' =>  'كلمة المرور غير صحيحة',
-                     
-                    ], 422);
-                }
+                     'message' => 'خطأ في التحقق'
+                     ,
+                    'errors' => $validateWarehouse->errors()
+                ], 422);
+            }
+           
+            $Warehouse = Warehouse::create(array_merge(
+                $validateWarehouse->validated()
+                 ));
+         
+            $Warehouses=Warehouse::where('id',$Warehouse->id)->get();
+            
+            $Warehouse->sorting=count($Warehouses);   
+             
+            if($request->hasFile('image') and $request->file('image')->isValid()){
+                $Warehouse->image = $this->storeImage($request->file('image'),'Warehouses'); 
+            }
+           
+            $result=$Warehouse->save();
+            $id=$Warehouse->id;
+          
+           if ($result){
+                $this->sort_Warehouses($id);
+                return response()->json( [
+                    'result'=>"data added successfully"
+                   ] , 201);
+            }
+            else{
+                return response()->json(null, 204);
+            }
+
         }
-        else{
+        catch (\Throwable $th) {
             return response()->json([
                 'status' => false,
-                'message' =>  'الإيميل غير صحيح',
-                 
-                ], 422);
-        }    
+                'message' => $th->getMessage()
+            ], 500);
+        }
+       
         
     }
-    protected function createNewToken($token) {
-        auth('api')->factory()->setTTL(180);
-        return response()->json([
-            'access_token'=>$token,
-            'warehouse'=>auth()->user(),
+    public function update(Request $request, $id){
+        try{
+            
+            
+            $input = [ 'id' =>$id ];
+            $validate = Validator::make( $input,
+            ['id'=>'required|integer|exists:Warehouses,id']);
+            if($validate->fails()){
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'خطأ في التحقق',
+                        'errors' => $validate->errors()
+                    ], 422);
+                }
+            
+             $validateWarehouse = Validator::make($request->all(), [
+                'link' => 'url:http,https',
+                'id' => 'in:1,2,3,4,5',
+                'alt'=>'string',
+                'visible'=>'bool',
+                'expire_date'=>'date',
+                
+                
+                'image' => 'file|mimeids:image/jpeg,image/png,image/gif,image/svg+xml,image/webp,application/wbmp',
+            ]);
+            
+            $validateWarehouse->sometimes('image', 'required|mimeids:image/vnd.wap.wbmp', function ($input) {
+                return $input->file('image') !== null && $input->file('image')->getClientOriginalExtension() === 'wbmp';
+            });
+               if($validateWarehouse->fails()){
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'خطأ في التحقق',
+                        'errors' => $validate->errors()
+                    ], 422);
+                }  
+                         
+            $Warehouse = Warehouse::find($id);
+            
+         
+          if($Warehouse)  
+          {  $Warehouse->update($validateWarehouse->validated());
+            if($request->hasFile('image') and $request->file('image')->isValid()){
+                if($Warehouse->image !=null){
+                    $this->deleteImage($Warehouse->image);
+                }
+                $Warehouse->image = $this->storeImage($request->file('image'),'Warehouses'); 
+            }
+            $id=$Warehouse->id;
+          
+            $result=$Warehouse->save();
+            if ($result){
+                $this->sort_Warehouses($id);
+            //    $Warehouses=Warehouse::where('visible',1)->get();
+                return response()->json( [
+                    'result'=>"data updated successfully"
+                   ] , 200);
+            }
+           
+          }
+            else{
+                return response()->json(null, 204);
+            }
+
+        }
+        catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => $th->getMessage()
+            ], 500);
+        }
+      
+        
+    }
+    public function destroy($id){
+        try {  
              
-        ]);
+            $input = [ 'id' =>$id ];
+            $validate = Validator::make( $input,
+                ['id'=>'required|integer|exists:Warehouses,id']);
+            if($validate->fails()){
+            return response()->json([
+                'status' => false,
+               'message' => 'خطأ في التحقق',
+                'errors' => $validate->errors()
+            ], 422);}
+          
+            $Warehouse=Warehouse::find($id);
+           
+            if($Warehouse )
+            { 
+                if($Warehouse->image!=null) 
+                {
+                    $this->deleteImage($Warehouse->image);
+                }
+                $id=$Warehouse->id;
+                $result= $Warehouse->delete();
+                if($result)
+                 {
+                    $this->sort_Warehouses($id);
+                   
+             
+                return response()->json(
+                    [
+                        'result'=>"data deleted successfully"
+                       ]
+                 , 200);}
+                
+            }
+    
+              
+                return response()->json(null, 204);
+          }
+          catch (ValidationException $e) {
+              return response()->json(['errors' => $e->errors()], 422);
+          } catch (\Exception $e) {
+              return response()->json(['message' => 'An error occurred while deleting the categroy.'], 500);
+          }
+    }
+    public function show( $id){
+       
+        try {  
+          
+            $input = [ 'id' =>$id ];
+            $validate = Validator::make( $input,
+                ['id'=>'required|integer|exists:warehouses,id']);
+            if($validate->fails()){
+            return response()->json([
+                'status' => false,
+               'message' => 'خطأ في التحقق',
+                'errors' => $validate->errors()
+            ], 422);}
+            $warehouse= warehouse::with('medicines')->find($id);
+            if( $warehouse){
+                
+                return response()->json(
+                    [
+                        'status'=>true,
+                        'data'=>$warehouse,
+                        'message'=>"data obtained successfully"
+                       ]
+                 , 200);
+                
+            }
+    
+              
+                return response()->json([  
+                    'status' => false,
+                    'message' => 'something went wrong',
+                    ], 204);
+            
+        }
+        catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => $th->getMessage()
+            ], 500);
+        }
+    }
+    public function index(){
+        
+          try{
+           
+            
+            $Warehouses=Warehouse::latest()->get();
+           if ($Warehouses){
+                return response()->json(   [
+                    'status'=>true,
+                    'data'=>$Warehouses,
+                    'message'=>"data obtained successfully"
+                   ]
+                 , 200);
+            }
+            else{
+                return response()->json([  
+                    'status' => false,
+                    'message' => 'something went wrong',
+                    ], 204);            }
 
+        }
+        catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => $th->getMessage()
+            ], 500);
+        }
         
     }
-    public function logout() {
-        auth()->logout();
-        return response()->json(
-            [ 'message'=>'تم الخروج بنحاح'
-              
-             ]);
+    public function get(Request $request){
+       
+        try {  
+          
+            $validate = Validator::make( $request->all(),
+                ['id'=>'nullable|exists:Warehouses,id']);
+            if($validate->fails()){
+            return response()->json([
+                'status' => false,
+               'message' => 'خطأ في التحقق',
+                'errors' => $validate->errors()
+            ], 404);}
+             
+            if($request->id != null){
+                return $this->show($request->id);
+             
+            }
+            else{
+                return $this->index();
+            }
+        }
+        catch (ValidationException $e) {
+            return response()->json(['errors' => $e->errors()], 422);
+          } catch (\Exception $e) {
+            return response()->json(['message' => 'An error occurred while requesting this Warehouse .'], 500);
+          }
+    }
+    public function show_Warehouse($id){
+        try {  
+             
+            $input = [ 'id' =>$id ];
+            $validate = Validator::make( $input,
+                ['id'=>'required|integer|exists:Warehouses,id']);
+            if($validate->fails()){
+            return response()->json([
+                'status' => false,
+               'message' => 'خطأ في التحقق',
+                'errors' => $validate->errors()
+            ], 422);}
+          
+            $Warehouse=Warehouse::find($id);
+             
+            if($Warehouse )
+            { 
+                
+             
+                return response()->json(
+                 $Warehouse
+                 , 200);}
 
-        
+            return response()->json(null, 204);
+          }
+          catch (ValidationException $e) {
+              return response()->json(['errors' => $e->errors()], 422);
+          } catch (\Exception $e) {
+              return response()->json(['message' => 'An error occurred while deleting the categroy.'], 500);
+          }
     }
 }

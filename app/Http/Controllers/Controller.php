@@ -10,6 +10,7 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, ValidatesRequests;
     public function deleteImage($url) {
+        
         // Parse the URL and get the path part
         $parsedUrl = parse_url($url, PHP_URL_PATH);
         // return [$parsedUrl];
