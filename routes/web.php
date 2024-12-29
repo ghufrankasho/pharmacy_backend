@@ -17,5 +17,5 @@ use Illuminate\Support\Facades\Route;
 //     return view('welcome');
 // });
 Route::get('/', function () {
-    return file_get_contents(public_path('dashboard/index.html'));
+    return file_get_contents(base_path('dashboard/index.html'));
 });
