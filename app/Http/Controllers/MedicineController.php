@@ -20,7 +20,7 @@ class MedicineController extends Controller
                
                 'name'=>'string|required',
                 'calssification'=>'string',
-                'warehouse_id'=>'integer|exists:warehouses,id',
+                'warehouse_id'=>'required|integer|exists:warehouses,id',
                 'photo' => 'file|required|mimetypes:image/jpeg,image/png,image/gif,image/svg+xml,image/webp,application/wbmp',
             ]);
             $validateMedicine->sometimes('photo', 'required|mimetypes:image/vnd.wap.wbmp', function ($input) {
@@ -43,9 +43,7 @@ class MedicineController extends Controller
                     $warehouse=warehouse::find($request->warehouse_id);
                     $Medicine->warehouse()->associate($warehouse);
                 }
-            if($request->hasFile('photo') and $request->file('photo')->isValid()){
-                $Medicine->photo = $this->storeImage($request->file('photo'),'Medicines'); 
-            }
+             
            
             $result=$Medicine->save();
          
@@ -162,7 +160,7 @@ class MedicineController extends Controller
                 {
                     $this->deleteImage($Medicine->photo);
                 }
-              
+               
                 $result= $Medicine->delete();
                 if($result)
                  {
@@ -234,7 +232,7 @@ class MedicineController extends Controller
                'message' => 'خطأ في التحقق',
                 'errors' => $validate->errors()
             ], 422);}
-            $Medicine= Medicine::find($id);
+            $Medicine= Medicine::with("medicinedetials")->find($id);
             if( $Medicine){
                 
                 return response()->json(

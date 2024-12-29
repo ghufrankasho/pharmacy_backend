@@ -53,12 +53,15 @@ class AuthController extends Controller
                 'errors' => $validatedData->errors()
             ], 422);
         }
+       
+       
         if ($request->type == 'warehouse') {
- 
+            
+           
             $user = Warehouse::create(array_merge(
-                $validatedData->validated(),
+                collect($validatedData->validated())->forget('type')->toArray(),
                 ['password'=>bcrypt($request->password)]
-                ));
+            ));
         }
         elseif ($request->type == 'user') {
           
@@ -69,7 +72,7 @@ class AuthController extends Controller
         } elseif ($request->type  == 'pharmacy') {
         
                 $user = Pharmacy::create(array_merge(
-                $validatedData->validated(),
+                    collect($validatedData->validated())->forget('type')->toArray(),
                 ['password'=>bcrypt($request->password)]
                 ));
                 if($request->hasFile('logo') and $request->file('logo')->isValid()){
@@ -93,19 +96,25 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         // Validate the incoming request data
-        $validatedData = $request->validate([
+        $validatedData = Validator::make($request->all(),[
             'email' => 'required|email',
             'password' => 'required|string|min:8',
             'type' => 'required|in:user,warehouse,pharmacy',    // user, warehouse, pharmacy
         ]);
-    
+        if($validatedData->failed()){
+            return response()->json([
+                'status' => false,
+                'message' => 'خطأ في التحقق',
+                'errors' => $validatedData->errors()->first()
+            ], 422);
+            }
         // Get user based on the provided type
         if ($request->type == 'warehouse') {
-            $user = Warehouse::where('email', $validatedData['email'])->first();
+            $user = Warehouse::where('email', $request->email)->first();
         } elseif ($request->type == 'user') {
-            $user = User::where('email', $validatedData['email'])->first();
+            $user = User::where('email', $request->email)->first();
         } elseif ($request->type == 'pharmacy') {
-            $user = Pharmacy::where('email', $validatedData['email'])->first();
+            $user = Pharmacy::where('email', $request->email)->first();
         } else {
             return response()->json([
                 'status' => false,
@@ -114,7 +123,7 @@ class AuthController extends Controller
         }
 
     // Check if the user exists and the password is correct
-    if (!$user || ! Hash::check($validatedData['password'], $user->password)) {
+    if (!$user || ! Hash::check($request->password, $user->password)) {
         return response()->json([
             'status' => false,
             'message' => 'Invalid credentials'

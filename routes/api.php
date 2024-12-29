@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MedicineController;
+use App\Http\Controllers\MedicinedetialController;
 use App\Http\Controllers\WarehouseController;
 
 /*
@@ -30,11 +31,25 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::group(['middleware'=>'auth:warehouse','prefix'=>'warehouse'],function($router){ 
+ 
+    //home page request
+    
+    Route::get('/home',[WarehouseController::class,'home'])->name("home");//parame id
+    Route::get('/',[WarehouseController::class,'show'])->name("warehouse_medicines");
+    // Route::post('/medicine',[MedicineController::class,'update']);
+    // Route::delete('/medicine/{id}',[MedicineController::class,'destroy']);
     //medicine
+    Route::get('/medicine',[MedicineController::class,'index']);//parame id
     Route::post('/medicine/add',[MedicineController::class,'store']);
     Route::get('/medicine/{id}',[MedicineController::class,'show']);
     Route::post('/medicine',[MedicineController::class,'update']);
     Route::delete('/medicine/{id}',[MedicineController::class,'destroy']);
+    //medicine Detailes
+    // Route::get('/medicineDetials',[MedicinedetialController::class,'index']);//parame id
+    Route::post('/medicineDetials/add',[MedicinedetialController::class,'store']);
+    Route::get('/medicineDetials/{id}',[MedicinedetialController::class,'show']);
+    Route::post('/medicineDetials',[MedicinedetialController::class,'update']);
+    Route::delete('/medicineDetials/{id}',[MedicinedetialController::class,'destroy']);
    });
 
    Route::group(['middleware'=>'auth:pharmacy','prefix'=>'pharmacy'],function($router){ 

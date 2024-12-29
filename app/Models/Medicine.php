@@ -24,6 +24,9 @@ class Medicine extends Model
     public function medicine_pharmacy(){
         return $this->hasMany(MedicinePharmacy::class); 
     } 
+    public function waited_orders() {
+        return $this->medicine_pharmacy()->where('confirmed', 'wait');
+    }
     public function order_detials(){
         return $this->hasMany(Orderdetial::class); 
     } 

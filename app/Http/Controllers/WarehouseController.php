@@ -189,12 +189,12 @@ class WarehouseController extends Controller
               return response()->json(['message' => 'An error occurred while deleting the categroy.'], 500);
           }
     }
-    public function show( $id){
+    public function show(Request $request){
        
         try {  
           
-            $input = [ 'id' =>$id ];
-            $validate = Validator::make( $input,
+           
+            $validate = Validator::make( $request->all(),
                 ['id'=>'required|integer|exists:warehouses,id']);
             if($validate->fails()){
             return response()->json([
@@ -202,7 +202,7 @@ class WarehouseController extends Controller
                'message' => 'خطأ في التحقق',
                 'errors' => $validate->errors()
             ], 422);}
-            $warehouse= warehouse::with('medicines')->find($id);
+            $warehouse= warehouse::with('medicines')->find($request->id);
             if( $warehouse){
                 
                 return response()->json(
@@ -258,6 +258,68 @@ class WarehouseController extends Controller
         }
         
     }
+    public function home(Request $request){
+        
+        try{
+        
+           
+            $validate = Validator::make($request->all(),
+                ['id'=>'required|integer|exists:warehouses,id']);
+            if($validate->fails()){
+            return response()->json([
+                'status' => false,
+               'message' => 'خطأ في التحقق',
+                'errors' => $validate->errors()
+            ], 422);}
+            
+        $warehouse= warehouse::find($request->id);
+        $medicines_data=[];
+          
+         if ($warehouse){
+            $medicines_data1=$warehouse->medicines()->latest()->take(5)->get();
+             
+            $medicines=$warehouse->medicines()->get();
+            $count_total_order=0;
+            $count_waited_order=0;
+            $waited_orders_objects=collect();
+            foreach($medicines as $med){
+                
+                $orders=$med->medicine_pharmacy()->get();
+                $count_total_order+=count($orders);
+                
+                $waited_orders=$med->waited_orders()->get();
+                $waited_orders_objects->merge($waited_orders);
+                $count_waited_order+=count($waited_orders);
+               
+                
+            }
+            $warehouse->waited_orders_number=$count_waited_order;
+            $warehouse->count_total_order=$count_total_order;
+            $warehouse->waited_orders=$waited_orders_objects;
+            $warehouse->medicines_data=$medicines_data1;
+            $warehouse->medicine_num=count($medicines);
+              return response()->json(   [
+                  'status'=>true,
+                  'data'=>$warehouse,
+                  'message'=>"data obtained successfully"
+                 ]
+               , 200);
+          }
+          else{
+              return response()->json([  
+                  'status' => false,
+                  'message' => 'something went wrong',
+                  ], 204);            }
+
+      }
+      catch (\Throwable $th) {
+          return response()->json([
+              'status' => false,
+              'message' => $th->getMessage()
+          ], 500);
+      }
+      
+  }
     public function get(Request $request){
        
         try {  
