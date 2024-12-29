@@ -50,8 +50,8 @@ class AuthController extends Controller
             return response()->json([
                 'status' => false,
                  'message' => 'خطأ في التحقق',
-                'errors' => $validatedData->errors()
-            ], 422);
+                'errors' => $validatedData->errors()->first()
+            ], 400);
         }
        
        
@@ -84,7 +84,8 @@ class AuthController extends Controller
         } else {
             return response()->json([
                 'status'=>false,
-                'message' => 'Invalid user type'], 400);
+                'message' => 'Invalid user type',
+                'errors'=>""], 400);
         }
 
       
@@ -106,7 +107,7 @@ class AuthController extends Controller
                 'status' => false,
                 'message' => 'خطأ في التحقق',
                 'errors' => $validatedData->errors()->first()
-            ], 422);
+            ], 400);
             }
         // Get user based on the provided type
         if ($request->type == 'warehouse') {
@@ -126,8 +127,9 @@ class AuthController extends Controller
     if (!$user || ! Hash::check($request->password, $user->password)) {
         return response()->json([
             'status' => false,
-            'message' => 'Invalid credentials'
-        ], 401);
+            'message' => 'Invalid credentials',
+            'errors'=>""
+        ], 400);
     }
 
     // Generate JWT token
@@ -158,7 +160,7 @@ class AuthController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Failed to log out, please try again'
-            ], 500);
+            ], 400);
         }
     }
     public function profile(Request $request)
