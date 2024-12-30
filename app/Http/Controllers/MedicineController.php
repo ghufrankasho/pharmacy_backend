@@ -160,7 +160,8 @@ class MedicineController extends Controller
                 {
                     $this->deleteImage($Medicine->photo);
                 }
-               
+                 $Medicine->medicinedetials()->delete();
+           
                 $result= $Medicine->delete();
                 if($result)
                  {

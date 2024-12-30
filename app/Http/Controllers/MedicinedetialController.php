@@ -60,64 +60,43 @@ class MedicinedetialController extends Controller
        
         
     }
-    public function update(Request $request, $id){
+    public function update(Request $request){
         try{
             
             
-            $input = [ 'id' =>$id ];
-            $validate = Validator::make( $input,
-            ['id'=>'required|integer|exists:meds,id']);
-            if($validate->fails()){
-                    return response()->json([
-                        'status' => false,
-                        'message' => 'خطأ في التحقق',
-                        'errors' => $validate->errors()
-                    ], 422);
-                }
+            
             
              $validatemed = Validator::make($request->all(), [
-                'link' => 'url:http,https',
-                'id' => 'in:1,2,3,4,5',
-                'alt'=>'string',
-                'visible'=>'bool',
+                'id'=>'required|integer|exists:medicinedetials,id',
+                'quantity' => 'integer',
+  
+                'component'=>'string',
+                'price'=>'integer',
                 'expire_date'=>'date',
                 
-                
-                'image' => 'file|mimeids:image/jpeg,image/png,image/gif,image/svg+xml,image/webp,application/wbmp',
-            ]);
+              ]);
             
-            $validatemed->sometimes('image', 'required|mimeids:image/vnd.wap.wbmp', function ($input) {
-                return $input->file('image') !== null && $input->file('image')->getClientOriginalExtension() === 'wbmp';
-            });
+            
                if($validatemed->fails()){
                     return response()->json([
                         'status' => false,
                         'message' => 'خطأ في التحقق',
-                        'errors' => $validate->errors()
+                        'errors' => $validatemed->errors()
                     ], 422);
                 }  
                          
-            $med = Medicinedetial::find($id);
+            $med = Medicinedetial::find($request->id);
             
          
           if($med)  
-          {  $med->update($validatemed->validated());
-            if($request->hasFile('image') and $request->file('image')->isValid()){
-                if($med->image !=null){
-                    $this->deleteImage($med->image);
-                }
-                $med->image = $this->storeImage($request->file('image'),'meds'); 
-            }
-            $id=$med->id;
-          
-            $result=$med->save();
-            if ($result){
-                $this->sort_meds($id);
-            //    $meds=Medicinedetial::where('visible',1)->get();
-                return response()->json( [
-                    'result'=>"data updated successfully"
-                   ] , 200);
-            }
+          { 
+            $med->update($validatemed->validated());
+             
+            return response()->json( [
+                'status'=>true,
+                'data'=>$med,
+                'message'=>"data updated successfully"
+               ] , 200);
            
           }
             else{
@@ -182,14 +161,14 @@ class MedicinedetialController extends Controller
           
             $input = [ 'id' =>$id ];
             $validate = Validator::make( $input,
-                ['id'=>'required|integer|exists:meds,id']);
+                ['id'=>'required|integer|exists:medicinedetials,id']);
             if($validate->fails()){
             return response()->json([
                 'status' => false,
                'message' => 'خطأ في التحقق',
                 'errors' => $validate->errors()
             ], 422);}
-            $med= Medicinedetial::with('medicines')->find($id);
+            $med= Medicinedetial::find($id);
             if( $med){
                 
                 return response()->json(
