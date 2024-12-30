@@ -43,7 +43,10 @@ class MedicineController extends Controller
                     $warehouse=warehouse::find($request->warehouse_id);
                     $Medicine->warehouse()->associate($warehouse);
                 }
-             
+                if($request->hasFile('photo') and $request->file('photo')->isValid()){
+                    $Medicine->photo = $this->storeImage($request->file('photo'),'Medicines'); 
+                    
+                }
            
             $result=$Medicine->save();
          
@@ -275,39 +278,42 @@ class MedicineController extends Controller
             }
              
                  
-            $medicines=array();
+            $medicine=false;
              
             $m_detiales= Medicinedetial::where('component','LIKE', '%' . $request->search .'%')->with('medicine')
             ->first();
-            
+       
             if($m_detiales)
             { 
-            
-                
-                $medicines= $m_detiales['medicine'];
+               
+        
+               
+                $medicine= $m_detiales['medicine'];
                 
             }
+      
           
-           
             $data = Medicine::where('name','LIKE', '%' .  $request->search .'%')
-                ->orwhere('calssification','LIKE', '%' .  $request->search .'%')->get();      
+                ->orwhere('calssification','LIKE', '%' .  $request->search .'%')->get()->toArray();      
               
- 
+           
             
             if(count($data)>0)
             {
-                
-                if(count($medicines)>0){
-                    
-                    $data=$medicines->merge($data);
-                }
                 $result=array();
-                $count=0;
+                $ids=array();
+                if($medicine){
+                 
+                    array_push($result,$medicine);
+                    array_push($ids,$medicine['id']);
+                }
+               
+            
                 foreach($data as $medicine){
-                    
-                    if(! in_array($medicine,$result)  )
+                
+                    if(! in_array($medicine['id'],$ids)  )
                     { 
-                        $count+=1;
+                        array_push($ids,$medicine['id']);
                         array_push($result , $medicine);
                         
                     }
@@ -335,19 +341,14 @@ class MedicineController extends Controller
             }
             else
             {
-                if(count($medicines)>0)
+              
+                if($medicine)
                 { 
                         $result=array();
-                        $count=0;
-                        foreach($medicines as $medicine){
-                            if(! in_array($medicine,$result)   ){
-                            
-                                array_push($result , $medicine);
-                            }
-                        }
-                        if ($result)
-                        { 
-                            return response()->json(
+                        array_push($result,$medicine);
+                           
+                        
+                        return response()->json(
                                     [
                                         'status'=>true,
                                         'data'=>$result,
@@ -355,7 +356,7 @@ class MedicineController extends Controller
                                     ]
                                 , 200);
                                 
-                        }
+                        
                     }
                 else{
                     return response()->json( [

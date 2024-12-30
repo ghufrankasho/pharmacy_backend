@@ -41,6 +41,7 @@ Route::group(['middleware'=>'auth:warehouse','prefix'=>'warehouse'],function($ro
     //medicine
     Route::get('/medicine',[MedicineController::class,'index']);//parame id
     Route::post('/medicine/add',[MedicineController::class,'store']);
+    Route::post('/medicine/search',[MedicineController::class,'search']);
     Route::get('/medicine/{id}',[MedicineController::class,'show']);
     Route::post('/medicine',[MedicineController::class,'update']);
     Route::delete('/medicine/{id}',[MedicineController::class,'destroy']);
