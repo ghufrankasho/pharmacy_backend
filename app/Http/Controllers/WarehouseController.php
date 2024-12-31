@@ -70,68 +70,50 @@ class WarehouseController extends Controller
        
         
     }
-    public function update(Request $request, $id){
+    public function update(Request $request){
         try{
             
+             
             
-            $input = [ 'id' =>$id ];
-            $validate = Validator::make( $input,
-            ['id'=>'required|integer|exists:Warehouses,id']);
-            if($validate->fails()){
-                    return response()->json([
-                        'status' => false,
-                        'message' => 'خطأ في التحقق',
-                        'errors' => $validate->errors()
-                    ], 422);
-                }
             
-             $validateWarehouse = Validator::make($request->all(), [
-                'link' => 'url:http,https',
-                'id' => 'in:1,2,3,4,5',
-                'alt'=>'string',
-                'visible'=>'bool',
-                'expire_date'=>'date',
+            $validateWarehouse = Validator::make($request->all(), [
                 
-                
-                'image' => 'file|mimeids:image/jpeg,image/png,image/gif,image/svg+xml,image/webp,application/wbmp',
+                'name'=>'string',
+                'phone'=>'string',
+                'address'=>'string',
+                'id'=>'required|integer|exists:Warehouses,id'
             ]);
             
-            $validateWarehouse->sometimes('image', 'required|mimeids:image/vnd.wap.wbmp', function ($input) {
-                return $input->file('image') !== null && $input->file('image')->getClientOriginalExtension() === 'wbmp';
-            });
-               if($validateWarehouse->fails()){
+             
+            if($validateWarehouse->fails()){
                     return response()->json([
                         'status' => false,
                         'message' => 'خطأ في التحقق',
-                        'errors' => $validate->errors()
+                        'errors' => $validateWarehouse->errors()
                     ], 422);
                 }  
                          
-            $Warehouse = Warehouse::find($id);
+            $Warehouse = Warehouse::find($request->id);
             
          
           if($Warehouse)  
           {  $Warehouse->update($validateWarehouse->validated());
-            if($request->hasFile('image') and $request->file('image')->isValid()){
-                if($Warehouse->image !=null){
-                    $this->deleteImage($Warehouse->image);
-                }
-                $Warehouse->image = $this->storeImage($request->file('image'),'Warehouses'); 
-            }
-            $id=$Warehouse->id;
-          
             $result=$Warehouse->save();
             if ($result){
-                $this->sort_Warehouses($id);
-            //    $Warehouses=Warehouse::where('visible',1)->get();
-                return response()->json( [
-                    'result'=>"data updated successfully"
+           
+                return response()->json(  [
+                    'status'=>true,
+                    'data'=>$Warehouse,
+                    'message'=>"data updated successfully"
                    ] , 200);
             }
            
           }
             else{
-                return response()->json(null, 204);
+                return response()->json([  
+                    'status' => false,
+                    'message' => 'something went wrong',
+                    ], 204);
             }
 
         }

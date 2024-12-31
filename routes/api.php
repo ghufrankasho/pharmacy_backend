@@ -23,7 +23,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
  
- Route::group(['prefix' => 'auth'], function () {
+Route::group(['prefix' => 'auth'], function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -36,7 +36,7 @@ Route::group(['middleware'=>'auth:warehouse','prefix'=>'warehouse'],function($ro
     
     Route::get('/home',[WarehouseController::class,'home'])->name("home");//parame id
     Route::get('/',[WarehouseController::class,'show'])->name("warehouse_medicines");
-    // Route::post('/medicine',[MedicineController::class,'update']);
+    Route::post('/',[WarehouseController::class,'update']);
     // Route::delete('/medicine/{id}',[MedicineController::class,'destroy']);
     //medicine
     Route::get('/medicine',[MedicineController::class,'index']);//parame id
