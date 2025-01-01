@@ -20,7 +20,7 @@ class MedicineController extends Controller
                
                 'name'=>'string|required',
                 'calssification'=>'string',
-                'warehouse_id'=>'required|integer|exists:warehouses,id',
+                'warehouse_id'=>'required|exists:warehouses,id',
                 'photo' => 'file|required|mimetypes:image/jpeg,image/png,image/gif,image/svg+xml,image/webp,application/wbmp',
             ]);
             $validateMedicine->sometimes('photo', 'required|mimetypes:image/vnd.wap.wbmp', function ($input) {
