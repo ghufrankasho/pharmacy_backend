@@ -16,9 +16,9 @@ use Illuminate\Validation\ValidationException;
 class AuthController extends Controller
 {
     public function __construct(){
-        $this->middleware('auth:api', ['except' => ['register', 'login', 'logout','profile']]);
-        $this->middleware('auth:warehouse', ['except' =>['register', 'login', 'logout','profile']]);
-        $this->middleware('auth:pharmacy', ['except' =>['register', 'login', 'logout','profile']]);
+        $this->middleware('auth:api', ['except' => ['register', 'login', 'logout','profile','reset_password']]);
+        $this->middleware('auth:warehouse', ['except' =>['register', 'login', 'logout','profile','reset_password']]);
+        $this->middleware('auth:pharmacy', ['except' =>['register', 'login', 'logout','profile','reset_password']]);
 
     }
     // Register a new user or pharmacy
@@ -123,29 +123,27 @@ class AuthController extends Controller
             ], 400);
         }
 
-    // Check if the user exists and the password is correct
-    if (!$user || ! Hash::check($request->password, $user->password)) {
+      // Check if the user exists and the password is correct
+        if (!$user || ! Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Invalid credentials',
+                'errors'=>""
+            ], 400);
+        }
+
+        // Generate JWT token
+        $token = JWTAuth::fromUser($user);
+
+        // Return the response with the user data and JWT token
         return response()->json([
-            'status' => false,
-            'message' => 'Invalid credentials',
-            'errors'=>""
-        ], 400);
+            'status' => true,
+            'message' => 'Login successful',
+            'user' => $user,
+            'token' => $token,
+        ], 200);
     }
-
-    // Generate JWT token
-    $token = JWTAuth::fromUser($user);
-
-    // Return the response with the user data and JWT token
-    return response()->json([
-        'status' => true,
-        'message' => 'Login successful',
-        'user' => $user,
-        'token' => $token,
-    ], 200);
-}
      
-
-  
     public function logout(Request $request)
     {
         // Assuming you're using JWT Auth package (Tymon\JWTAuth)
@@ -182,6 +180,63 @@ class AuthController extends Controller
     
         return response()->json(['message' => 'No user found'], 404);
     }
+    public function reset_password(Request $request)
+    {
+        // Validate the input
+        $validator = Validator::make($request->all(), [
+            'old_password' => 'required|string',
+            'new_password' => 'required|string|confirmed|min:8',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Validation error',
+                'errors' => $validator->errors()->first(),
+            ], 400);
+        }
+
+        // Identify the authenticated user
+        $user = null;
+
+        if (auth('api')->check()) {
+            $user = auth('api')->user();
+        } elseif (auth('warehouse')->check()) {
+            $user = auth('warehouse')->user();
+        } elseif (auth('pharmacy')->check()) {
+            $user = auth('pharmacy')->user();
+        }
+
+        // If no user is authenticated
+        if (!$user) {
+            return response()->json([
+                'status' => false,
+                'errors' => 'No authenticated user found',
+                'message' => 'No authenticated user found',
+            ], 404);
+        }
+
+        // Check if the old password matches
+        if (!Hash::check($request->old_password, $user->password)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Old password is incorrect',
+                'errors' => 'Old password is incorrect'
+                
+            ], 400);
+        }
+
+        // Update the password
+        $user->password = bcrypt($request->new_password);
+        $user->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Password changed successfully',
+            'user' => $user,
+        ], 200);
+    }
+
     
 
  

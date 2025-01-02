@@ -335,7 +335,7 @@ class MedicineController extends Controller
                         'status'=>true,
                         'data'=>[],
                         'message'=>"no data found for this search"
-                       ],200); 
+                       ],204); 
                     
                 }
             }
@@ -363,7 +363,7 @@ class MedicineController extends Controller
                         'status'=>true,
                         'data'=>[],
                         'message'=>"no data found for this search"
-                    ],200); 
+                    ],204); 
                     
                 }
             }
