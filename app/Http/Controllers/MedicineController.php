@@ -223,12 +223,12 @@ class MedicineController extends Controller
         }
         
     }
-    public function show( $id){
+    public function show(Request $request ){
        
         try {  
           
-            $input = [ 'id' =>$id ];
-            $validate = Validator::make( $input,
+             
+            $validate = Validator::make( $request->all(),
                 ['id'=>'required|integer|exists:medicines,id']);
             if($validate->fails()){
             return response()->json([
@@ -236,7 +236,7 @@ class MedicineController extends Controller
                'message' => 'خطأ في التحقق',
                 'errors' => $validate->errors()
             ], 422);}
-            $Medicine= Medicine::with("medicinedetials")->find($id);
+            $Medicine= Medicine::with("medicinedetials")->find($request->id);
             if( $Medicine){
                 
                 return response()->json(
