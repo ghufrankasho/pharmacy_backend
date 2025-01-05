@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class MedicinePharmacy extends Model
 {
     use HasFactory;
+    public $timestamps=true;
     protected $fillable = [
         'pharmacy_id',
         'medicine_id',
@@ -18,7 +19,7 @@ class MedicinePharmacy extends Model
     public function pharmacy(){
         return $this->belongsTo(Pharmacy::class); 
     } 
-    public function medicinede(){
-        return $this->belongsTo(Medicine::class); 
+    public function medicine(){
+        return $this->belongsTo(Medicine::class)->with('medicinedetials'); 
     } 
 }

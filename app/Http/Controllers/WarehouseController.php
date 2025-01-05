@@ -245,32 +245,24 @@ class WarehouseController extends Controller
         try{
         
            
-            $validate = Validator::make($request->all(),
-                ['id'=>'required|integer|exists:warehouses,id']);
-            if($validate->fails()){
-            return response()->json([
-                'status' => false,
-               'message' => 'خطأ في التحقق',
-                'errors' => $validate->errors()
-            ], 422);}
             
-        $warehouse= warehouse::find($request->id);
+            
+        $warehouse = auth('warehouse')->user();
         $medicines_data=[];
           
          if ($warehouse){
             $medicines_data1=$warehouse->medicines()->latest()->take(5)->get();
-             
             $medicines=$warehouse->medicines()->get();
             $count_total_order=0;
             $count_waited_order=0;
             $waited_orders_objects=collect();
             foreach($medicines as $med){
                 
-                $orders=$med->medicine_pharmacy()->get();
+                $orders=$med->medicine_pharmacy()->with('medicine','pharmacy')->get();
                 $count_total_order+=count($orders);
                 
                 $waited_orders=$med->waited_orders()->get();
-                $waited_orders_objects->merge($waited_orders);
+                $waited_orders_objects= $waited_orders_objects->merge($orders);
                 $count_waited_order+=count($waited_orders);
                
                 

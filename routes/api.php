@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MedicineController;
 use App\Http\Controllers\MedicinedetialController;
+use App\Http\Controllers\MedicinePharmacyController;
 use App\Http\Controllers\WarehouseController;
 
 /*
@@ -29,7 +30,7 @@ Route::group(['prefix' => 'auth'], function () {
 
 Route::group(['middleware'=>'auth:warehouse','prefix'=>'warehouse'],function($router){ 
  
-    //home page request
+    //home page requests
     
     Route::get('/home',[WarehouseController::class,'home'])->name("home");//parame id
     Route::get('/',[WarehouseController::class,'show'])->name("warehouse_medicines");
@@ -48,16 +49,29 @@ Route::group(['middleware'=>'auth:warehouse','prefix'=>'warehouse'],function($ro
     Route::get('/medicineDetials/{id}',[MedicinedetialController::class,'show']);
     Route::post('/medicineDetials',[MedicinedetialController::class,'update']);
     Route::delete('/medicineDetials/{id}',[MedicinedetialController::class,'destroy']);
+
+   
+    //medicine-pharmacy 
+    Route::get('/medicinePharmacy',[MedicinePharmacyController::class,'confirmOrder']);
+    Route::get('/medicinePharmacy/search',[MedicinePharmacyController::class,'search'])->name('search');
+    Route::get('/medicinePharmacy/orders',[MedicinePharmacyController::class,'getOrdersWarehouse']);
+    Route::delete('/medicinePharmacy',[MedicinePharmacyController::class,'destroy']);
+    
+     
    });
 
-   Route::group(['middleware'=>'auth:pharmacy','prefix'=>'pharmacy'],function($router){ 
+Route::group(['middleware'=>'auth:pharmacy','prefix'=>'pharmacy'],function($router){ 
     //medicine
     Route::post('/medicine',[MedicineController::class,'search']);
     Route::get('/medicine/{id}',[MedicineController::class,'show']);
     
-     //warehouse
-     Route::get('/warehouse',[WarehouseController::class,'index']);
-     Route::get('/warehouse/{id}',[WarehouseController::class,'show']);
+    //medicine-pharmacy 
+    Route::post('/medicinePharmacy/sendOrder',[MedicinePharmacyController::class,'sendOrder']);
+    Route::get('/medicinePharmacy/orders',[MedicinePharmacyController::class,'getOrders']);
+    
+    //warehouse
+    Route::get('/warehouse',[WarehouseController::class,'index']);
+    Route::get('/warehouse/{id}',[WarehouseController::class,'show']);
      
    });
 
@@ -74,7 +88,8 @@ Route::group(['middleware'=>'auth:warehouse','prefix'=>'warehouse'],function($ro
 
 
 
-Route::get('/view-clear', function() {
+
+   Route::get('/view-clear', function() {
     $exitCode = Artisan::call('cache:clear');
     $exitCode = Artisan::call('view:clear');
     $exitCode = Artisan::call('config:cache');
