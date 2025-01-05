@@ -17,9 +17,18 @@ class MedicinePharmacyController extends Controller
     public function sendOrder(Request $request)
     {
         try {
-            // Validate the request
+            
+            $user = auth('pharmacy')->user();
+            
+            // If no user is authenticated
+            if (!$user) {
+                return response()->json([
+                    'status' => false,
+                    'errors' => 'No authenticated user found',
+                    'message' => 'No authenticated user found',
+                ], 404);
+            }
             $validate = Validator::make($request->all(), [
-                'id' => 'required|exists:pharmacies,id', // Validate the pharmacy ID
                 'orders' => 'required|array', // Validate that 'orders' is an array
                 'orders.*.medicine_id' => 'required|exists:medicines,id', // Validate each medicine_id
                 'orders.*.quantity' => 'required|integer|min:1', // Validate each quantity
@@ -33,9 +42,7 @@ class MedicinePharmacyController extends Controller
                 ], 422);
             }
 
-            // Process the validated data
-            $pharmacyId = $request->id; // Extract the pharmacy ID
-            $orders = $request->orders; // Extract the orders array
+             $orders = $request->orders; // Extract the orders array
 
             // Create each order
             foreach ($orders as $order) {
@@ -44,7 +51,7 @@ class MedicinePharmacyController extends Controller
 
                 // Create a new record in the medicine_pharmacies table
                 DB::table('medicine_pharmacies')->insert([
-                    'pharmacy_id' => $pharmacyId,
+                    'pharmacy_id' => $user->id,
                     'medicine_id' => $medicineId,
                     'quantity' => $quantity,
                  
