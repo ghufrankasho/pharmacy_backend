@@ -37,17 +37,17 @@ Route::group(['middleware'=>'auth:warehouse','prefix'=>'warehouse'],function($ro
     Route::post('/',[WarehouseController::class,'update']);
     // Route::delete('/medicine/{id}',[MedicineController::class,'destroy']);
     //medicine
-    Route::get('/medicine',[MedicineController::class,'index']);//parame id
-    Route::post('/medicine/add',[MedicineController::class,'store']);
-    Route::post('/medicine/search',[MedicineController::class,'search']);
-    Route::get('/medicine/{id}',[MedicineController::class,'show']);
-    Route::post('/medicine',[MedicineController::class,'update']);
+    Route::get('/medicine',[MedicineController::class,'index'])->name('indexmedicine');;//parame id
+    Route::post('/medicine/add',[MedicineController::class,'store'])->name('addmedicine');
+    Route::post('/medicine/search',[MedicineController::class,'search'])->name('searchmedicine');;
+    Route::get('/medicine/{id}',[MedicineController::class,'show'])->name('showmedicine');;
+    Route::post('/medicine',[MedicineController::class,'update'])->name('updatemedicine');;
     Route::delete('/medicine/{id}',[MedicineController::class,'destroy']);
     //medicine Detailes
     // Route::get('/medicineDetials',[MedicinedetialController::class,'index']);//parame id
-    Route::post('/medicineDetials/add',[MedicinedetialController::class,'store']);
+    Route::post('/medicineDetials/add',[MedicinedetialController::class,'store'])->name('addmedicineDetials');
     Route::get('/medicineDetials/{id}',[MedicinedetialController::class,'show']);
-    Route::post('/medicineDetials',[MedicinedetialController::class,'update']);
+    Route::post('/medicineDetials',[MedicinedetialController::class,'update'])->name('updatemedicineDetials');;
     Route::delete('/medicineDetials/{id}',[MedicinedetialController::class,'destroy']);
 
    
