@@ -39,7 +39,7 @@ Route::group(['middleware'=>'auth:warehouse','prefix'=>'warehouse'],function($ro
     //medicine
     Route::get('/medicine',[MedicineController::class,'index'])->name('indexmedicine');;//parame id
     Route::post('/medicine/add',[MedicineController::class,'store'])->name('addmedicine');
-    Route::post('/medicine/search',[MedicineController::class,'search'])->name('searchmedicine');;
+    Route::get('/medicine/search',[MedicineController::class,'search'])->name('searchmedicine');;
     Route::get('/medicine',[MedicineController::class,'show'])->name('showmedicine');;
     Route::post('/medicine',[MedicineController::class,'update'])->name('updatemedicine');;
     Route::delete('/medicine/{id}',[MedicineController::class,'destroy']);
