@@ -147,7 +147,7 @@ class MedicineController extends Controller
              
             $input = [ 'id' =>$id ];
             $validate = Validator::make( $input,
-                ['id'=>'required|integer|exists:Medicines,id']);
+                ['id'=>'required|integer|exists:medicines,id']);
             if($validate->fails()){
             return response()->json([
                 'status' => false,
@@ -190,7 +190,7 @@ class MedicineController extends Controller
           catch (ValidationException $e) {
               return response()->json(['errors' => $e->errors()], 422);
           } catch (\Exception $e) {
-              return response()->json(['message' => 'An error occurred while deleting the categroy.'], 500);
+              return response()->json(['message' => 'An error occurred while deleting the medicine.'], 500);
           }
     }
     public function index(){
