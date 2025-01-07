@@ -79,7 +79,7 @@ class MedicineController extends Controller
              
                 $validateMedicine = Validator::make($request->all(), 
                 [
-                    'id'=>'required|integer|exists:Medicines,id',
+                    'id'=>'required|integer|exists:medicines,id',
                     'name'=>'string',
                     'calssification'=>'string',
                     'warehouse_id'=>'integer|exists:warehouses,id',
