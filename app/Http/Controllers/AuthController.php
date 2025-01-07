@@ -89,8 +89,12 @@ class AuthController extends Controller
         }
 
       
-
-        return response()->json(['message' => 'Registration successful', 'user' => $user], 201);
+        // Generate JWT token
+        $token = JWTAuth::fromUser($user);
+        return response()->json([
+            'message' => 'Registration successful', 
+            'user' => $user,
+            'token' => $token,], 201);
     }
 
     // Login for user and pharmacy (JWT)
