@@ -63,7 +63,7 @@ Route::group(['middleware'=>'auth:warehouse','prefix'=>'warehouse'],function($ro
 Route::group(['middleware'=>'auth:pharmacy','prefix'=>'pharmacy'],function($router){ 
     //medicine
     Route::post('/medicine',[MedicineController::class,'search']);
-    Route::get('/medicine/{id}',[MedicineController::class,'show']);
+    Route::get('/medicine',[MedicineController::class,'show']);
     
     //medicine-pharmacy 
     Route::post('/medicinePharmacy/sendOrder',[MedicinePharmacyController::class,'sendOrder']);

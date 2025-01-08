@@ -227,7 +227,7 @@ class MedicineController extends Controller
        
         try {  
           
-             
+            
             $validate = Validator::make( $request->all(),
                 ['id'=>'required|integer|exists:medicines,id']);
             if($validate->fails()){
