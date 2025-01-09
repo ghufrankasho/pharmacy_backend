@@ -71,7 +71,7 @@ Route::group(['middleware'=>'auth:pharmacy','prefix'=>'pharmacy'],function($rout
     
     //warehouse
     Route::get('/warehouse',[WarehouseController::class,'index']);
-    Route::get('/warehouse/{id}',[WarehouseController::class,'show']);
+    Route::get('/warehouse',[WarehouseController::class,'show']);
      
    });
 
