@@ -74,22 +74,24 @@ class MedicinePharmacyController extends Controller
     public function getOrders(Request $request){
         try {
              
-            // Validate the request
-            $validate = Validator::make($request->all(), [
-                'id' => 'required|exists:pharmacies,id', // Validate the pharmacy ID
-              ]);
-
-            if ($validate->fails()) {
+            $pharmacy = auth('pharmacy')->user();
+            
+            // If no user is authenticated
+            if (!$pharmacy) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Validation Error',
-                    'errors' => $validate->errors()
-                ], 422);
+                    'errors' => 'No authenticated user found',
+                    'message' => 'No authenticated user found',
+                ], 404);
             }
-
- 
-            $pharmacy = Pharmacy::with('medicine_pharmacy')->find($request->id);
-           
+            //done , wait, deny
+            $type="wait";
+            if($request->has('type')){
+               if($request->type==1)$type="done"; 
+               elseif($request->type==0)$type="deny"; 
+                
+            }
+            $pharmacy=$pharmacy->medicine_pharmacy()->where("confirmed",$type)->get();
             if( $pharmacy){
                 return response()->json([
                     'status' => true,
@@ -322,7 +324,7 @@ class MedicinePharmacyController extends Controller
                     'message'=>"something went wrong "
                  ], 204);
         }
-    catch (ValidationException $e) {
+     catch (ValidationException $e) {
               return response()->json(['errors' => $e->errors()], 422);
         } catch (\Exception $e) {
               return response()->json(['message' => 'An error occurred while deleting the categroy.'], 500);
