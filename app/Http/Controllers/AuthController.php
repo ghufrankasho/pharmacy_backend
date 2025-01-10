@@ -165,7 +165,7 @@ class AuthController extends Controller
             ], 400);
         }
     }
-    public function profile(Request $request)
+    public function profile()
     {
         // Determine the guard based on the user's type or provided token
         $user = null;
@@ -179,7 +179,9 @@ class AuthController extends Controller
         }
     
         if ($user) {
-            return response()->json($user);
+            return response()->json([
+                'status'=>true,
+                'user'=>$user],200);
         }
     
         return response()->json(['message' => 'No user found'], 404);
