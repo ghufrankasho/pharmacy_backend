@@ -116,4 +116,111 @@ class OrderController extends Controller
             ], 500);
         }
     }
+    private function showOrder(Request $request){
+       
+        try {  
+          
+            $pharmacy = auth('pharmacy')->user();
+            
+            // If no user is authenticated
+            if (!$pharmacy) {
+                return response()->json([
+                    'status' => false,
+                    'errors' => 'No authenticated user found',
+                    'message' => 'No authenticated user found',
+                ], 404);
+            }
+            
+            $validate = Validator::make( $request->all(),
+                ['id'=>'required|integer|exists:orders,id']);
+            if($validate->fails()){
+            return response()->json([
+                'status' => false,
+               'message' => 'خطأ في التحقق',
+                'errors' => $validate->errors()
+            ], 422);}
+            $order= Order::with('user','order_detials')->find($request->id);
+            if( $order){
+                
+                return response()->json(
+                    [
+                        'status'=>true,
+                        'data'=>$order,
+                        'message'=>"data obtained successfully"
+                       ]
+                 , 200);
+                
+            }
+    
+              
+                return response()->json([  
+                    'status' => false,
+                    'message' => 'something went wrong',
+                    ], 204);
+            
+        }
+        catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => $th->getMessage()
+            ], 500);
+        }
+    }
+    private function index(){
+        
+          try{
+            $pharmacy = auth('pharmacy')->user();
+            
+            // If no user is authenticated
+            if (!$pharmacy) {
+                return response()->json([
+                    'status' => false,
+                    'errors' => 'No authenticated user found',
+                    'message' => 'No authenticated user found',
+                ], 404);
+            }
+            
+            $users=$pharmacy->orders()->with('user')->get();
+           if ($users){
+                return response()->json(   [
+                    'status'=>true,
+                    'data'=>$users,
+                    'message'=>"data obtained successfully"
+                   ]
+                 , 200);
+            }
+            else{
+                return response()->json([  
+                    'status' => false,
+                    'message' => 'something went wrong',
+                    ], 204);            }
+
+        }
+        catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => $th->getMessage()
+            ], 500);
+        }
+        
+    }
+    public function get(Request $request){
+       
+        try {  
+          
+           
+            if( $request->has('id')){
+                return $this->showOrder($request);
+             
+            }
+            else{
+                return $this->index();
+            }
+        }
+        catch (ValidationException $e) {
+            return response()->json(['errors' => $e->errors()], 422);
+          } catch (\Exception $e) {
+            return response()->json(['message' => 'An error occurred while requesting this user .'], 500);
+          }
+    }
 }

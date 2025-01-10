@@ -9,6 +9,8 @@ use App\Http\Controllers\MedicinedetialController;
 use App\Http\Controllers\MedicinePharmacyController;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\OrderController;
+ 
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -71,6 +73,9 @@ Route::group(['middleware'=>'auth:pharmacy','prefix'=>'pharmacy'],function($rout
     
     //warehouse
     Route::get('/warehouse',[WarehouseController::class,'get']);
+    // Route::get('/warehouse',[WarehouseController::class,'show']);
+    //users orders
+    Route::get('/user',[OrderController::class,'get']);
     // Route::get('/warehouse',[WarehouseController::class,'show']);
      
 });
