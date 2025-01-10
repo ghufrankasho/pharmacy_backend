@@ -8,6 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class Order extends Model
 {
     use HasFactory;
+    protected $fillable = [
+        'pharmacy_id',
+        'user_id',
+       
+    ];
     
     public function order_detials(){
         return $this->hasMany(Orderdetial::class); 

@@ -91,11 +91,11 @@ class MedicinePharmacyController extends Controller
                elseif($request->type==0)$type="deny"; 
                 
             }
-            $pharmacy=$pharmacy->medicine_pharmacy()->where("confirmed",$type)->get();
-            if( $pharmacy){
+            $orders=$pharmacy->medicine_pharmacy()->where("confirmed",$type)->get();
+            if( $orders){
                 return response()->json([
                     'status' => true,
-                    "data"=> $pharmacy,
+                    "data"=> $orders,
                     'message' => ' data obtained successfully',
                 ], 200);
             }

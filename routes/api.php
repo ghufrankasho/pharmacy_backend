@@ -8,7 +8,7 @@ use App\Http\Controllers\MedicineController;
 use App\Http\Controllers\MedicinedetialController;
 use App\Http\Controllers\MedicinePharmacyController;
 use App\Http\Controllers\WarehouseController;
-
+use App\Http\Controllers\OrderController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -58,7 +58,7 @@ Route::group(['middleware'=>'auth:warehouse','prefix'=>'warehouse'],function($ro
     Route::delete('/medicinePharmacy',[MedicinePharmacyController::class,'destroy']);
     
      
-   });
+});
 
 Route::group(['middleware'=>'auth:pharmacy','prefix'=>'pharmacy'],function($router){ 
     //medicine
@@ -70,10 +70,27 @@ Route::group(['middleware'=>'auth:pharmacy','prefix'=>'pharmacy'],function($rout
     Route::get('/medicinePharmacy',[MedicinePharmacyController::class,'getOrders']);
     
     //warehouse
-    Route::get('/warehouse',[WarehouseController::class,'index']);
-    Route::get('/warehouse',[WarehouseController::class,'show']);
+    Route::get('/warehouse',[WarehouseController::class,'get']);
+    // Route::get('/warehouse',[WarehouseController::class,'show']);
      
-   });
+});
+
+
+Route::group(['middleware'=>'auth:user','prefix'=>'user'],function($router){ 
+    //order
+    Route::post('/sendOrders',[OrderController::class,'store']);
+    Route::get('/orders',[OrderController::class,'show']);
+    Route::get('/medicine',[MedicineController::class,'show']);
+    
+    // //medicine-pharmacy 
+    // Route::post('/medicinePharmacy/sendOrder',[MedicinePharmacyController::class,'sendOrder']);
+    // Route::get('/medicinePharmacy',[MedicinePharmacyController::class,'getOrders']);
+    
+    // //warehouse
+    // Route::get('/warehouse',[WarehouseController::class,'index']);
+    // Route::get('/warehouse',[WarehouseController::class,'show']);
+     
+});
 
 
 
@@ -87,9 +104,7 @@ Route::group(['middleware'=>'auth:pharmacy','prefix'=>'pharmacy'],function($rout
 
 
 
-
-
-   Route::get('/view-clear', function() {
+Route::get('/view-clear', function() {
     $exitCode = Artisan::call('cache:clear');
     $exitCode = Artisan::call('view:clear');
     $exitCode = Artisan::call('config:cache');

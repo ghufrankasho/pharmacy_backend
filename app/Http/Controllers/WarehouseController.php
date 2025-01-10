@@ -298,17 +298,9 @@ class WarehouseController extends Controller
        
         try {  
           
-            $validate = Validator::make( $request->all(),
-                ['id'=>'nullable|exists:Warehouses,id']);
-            if($validate->fails()){
-            return response()->json([
-                'status' => false,
-               'message' => 'خطأ في التحقق',
-                'errors' => $validate->errors()
-            ], 404);}
-             
-            if($request->id != null){
-                return $this->show($request->id);
+           
+            if( $request->has('id')){
+                return $this->show($request);
              
             }
             else{
