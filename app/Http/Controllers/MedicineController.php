@@ -43,10 +43,10 @@ class MedicineController extends Controller
                     $warehouse=warehouse::find($request->warehouse_id);
                     $Medicine->warehouse()->associate($warehouse);
                 }
-                if($request->hasFile('photo') and $request->file('photo')->isValid()){
+            if($request->hasFile('photo') and $request->file('photo')->isValid()){
                     $Medicine->photo = $this->storeImage($request->file('photo'),'Medicines'); 
                     
-                }
+                }    
            
             $result=$Medicine->save();
          

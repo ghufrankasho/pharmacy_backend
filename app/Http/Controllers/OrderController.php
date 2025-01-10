@@ -27,7 +27,11 @@ class OrderController extends Controller
                 'orders' => 'required|array', // Validate that 'orders' is an array
                 'orders.*.medicine_id' => 'required|exists:medicines,id', // Validate each medicine_id
                 'orders.*.quantity' => 'required|integer|min:1', // Validate each quantity
+                'photo' => 'file|required|mimetypes:image/jpeg,image/png,image/gif,image/svg+xml,image/webp,application/wbmp',
             ]);
+            $validate->sometimes('photo', 'required|mimetypes:image/vnd.wap.wbmp', function ($input) {
+                  return $input->file('photo') !== null && $input->file('photo')->getClientOriginalExtension() === 'wbmp';
+            });
 
             if ($validate->fails()) {
                 return response()->json([
@@ -42,7 +46,11 @@ class OrderController extends Controller
                     collect($validate->validated())->forget('orders')->toArray(),
                     [ 'user_id'=>$user->id]
                      ));
-          
+            if($request->hasFile('photo') and $request->file('photo')->isValid()){
+                        $order->photo = $this->storeImage($request->file('photo'),'Medicines'); 
+                        $order->save();
+                        
+                    } 
                     // Create each order
             foreach ($orders as $ord) {
                 $medicineId = $ord['medicine_id'];

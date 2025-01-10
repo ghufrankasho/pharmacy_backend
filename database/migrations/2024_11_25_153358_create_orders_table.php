@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->string('confirmed')->default('wait');//done , wait, deny
+            $table->string('photo')->default("");
             $table->foreignId('user_id')->constrained('users','id')->default(null);
             $table->foreignId('pharmacy_id')->constrained('pharmacies','id')->default(null);
            

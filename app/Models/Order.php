@@ -11,6 +11,7 @@ class Order extends Model
     protected $fillable = [
         'pharmacy_id',
         'user_id',
+        'photo'
        
     ];
     
