@@ -148,17 +148,29 @@ class AuthController extends Controller
         ], 200);
     }
      
-    public function logout(Request $request)
+    public function logout()
     {
         // Assuming you're using JWT Auth package (Tymon\JWTAuth)
         try {
-            // return response()->json(auth()->user());
-            // Invalidate the token
-          auth()->logout();  // This invalidates the current token
-
-            return response()->json([
-                'message' => 'Successfully logged out'
-            ], 200);
+            $user = null;
+    
+            if (auth('user')->check()) {
+                $user = auth('user')->user(); // For 'user' type
+            } elseif (auth('warehouse')->check()) {
+                $user = auth('warehouse')->user(); // For 'warehouse' type
+            } elseif (auth('pharmacy')->check()) {
+                $user = auth('pharmacy')->user(); // For 'pharmacy' type
+            }
+        
+            if ($user) {
+                auth()->logout();  
+                return response()->json([
+                    'status'=>true,
+                    'user'=>$user,
+                    'message' => 'Successfully logged out'],200);
+            }
+            return response()->json(['message' => 'No user found'], 404);
+    
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Failed to log out, please try again'
