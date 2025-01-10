@@ -28,7 +28,7 @@ class Authenticate extends Middleware
         try {
             $user = JWTAuth::parseToken()->authenticate();
         } catch (TokenExpiredException $e) {
-            return response()->json(['error' => 'Your token has been  expired '], 401);
+            return response()->json(['error' => 'Your token has  expired '], 401);
         } catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
             return response()->json(['error' => 'Token is invalid'], 401);
         } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
