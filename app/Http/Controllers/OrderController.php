@@ -24,7 +24,7 @@ class OrderController extends Controller
             }
             $validate = Validator::make($request->all(), [
                 'pharmacy_id'=>'required|integer|exists:pharmacies,id',
-                'orders' => 'required|array', // Validate that 'orders' is an array
+                'orders' => 'array', // Validate that 'orders' is an array
                 'orders.*.medicine_id' => 'required|exists:medicines,id', // Validate each medicine_id
                 'orders.*.quantity' => 'required|integer|min:1', // Validate each quantity
                 'photo' => 'file|mimetypes:image/jpeg,image/png,image/gif,image/svg+xml,image/webp,application/wbmp',
