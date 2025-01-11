@@ -40,8 +40,7 @@ class OrderController extends Controller
                     'errors' => $validate->errors()
                 ], 422);
             }
-            $orders = $request->orders; // Extract the orders array
-         
+           
             $order = Order::create(array_merge(
                     collect($validate->validated())->forget('orders')->toArray(),
                     [ 'user_id'=>$user->id]
@@ -50,8 +49,10 @@ class OrderController extends Controller
                         $order->photo = $this->storeImage($request->file('photo'),'orders'); 
                         $order->save();
                         
-                    } 
-                    // Create each order
+            } 
+            // Create each order
+            if($request->has('orders')){$orders = $request->orders; // Extract the orders array
+         
             foreach ($orders as $ord) {
                 $medicineId = $ord['medicine_id'];
            
@@ -65,7 +66,7 @@ class OrderController extends Controller
                  
                 ]);
              
-            }
+            }}
 
             return response()->json([
                 'status' => true,
