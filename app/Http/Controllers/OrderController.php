@@ -231,4 +231,69 @@ class OrderController extends Controller
             return response()->json(['message' => 'An error occurred while requesting this user .'], 500);
           }
     }
+    public function update(Request $request){
+        try{
+            
+            $user = auth('pharmacy')->user();
+            
+                 // If no user is authenticated
+                if (!$user) {
+                    return response()->json([
+                        'status' => false,
+                        'errors' => 'No authenticated user found',
+                        'message' => 'No authenticated user found',
+                    ], 404);
+                }
+             
+                $validateMedicine = Validator::make($request->all(), 
+                [
+                    'order_id'=>'required|integer|exists:orders,id',
+                    'confirmed'=>'string',
+                ]);
+             
+             
+               if($validateMedicine->fails()){
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'خطأ في التحقق',
+                        'errors' => $validateMedicine->errors()
+                    ], 422);
+                }  
+                         
+            $order = Order::find($request->order_id);
+            
+         
+          if($order)  
+          {  
+            $order->update($validateMedicine->validated());
+            
+            $result=$order->save();
+          
+            if ($result){
+         
+                return response()->json( [
+                    'status'=>true,
+                    'data'=>$order,
+                    'message'=>"data updated successfully"
+                   ] , 200);
+            }
+           
+          }
+            else{
+                return response()->json([  
+                    'status' => false,
+                    'message' => 'something went wrong',
+                    ], 204);
+                }
+
+        }
+        catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => $th->getMessage()
+            ], 500);
+        }
+      
+        
+    }
 }

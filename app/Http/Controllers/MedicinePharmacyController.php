@@ -91,7 +91,7 @@ class MedicinePharmacyController extends Controller
                elseif($request->type==0)$type="deny"; 
                 
             }
-            $orders=$pharmacy->medicine_pharmacy()->where("confirmed",$type)->get();
+            $orders=$pharmacy->medicine_pharmacy()->with('medicine')->where("confirmed",$type)->get();
             if( $orders){
                 return response()->json([
                     'status' => true,
@@ -329,6 +329,71 @@ class MedicinePharmacyController extends Controller
         } catch (\Exception $e) {
               return response()->json(['message' => 'An error occurred while deleting the categroy.'], 500);
     } 
+    }
+    public function showWarehouseOrder(Request $request){
+        try{
+            
+            $user = auth('pharmacy')->user();
+            
+                 // If no user is authenticated
+                if (!$user) {
+                    return response()->json([
+                        'status' => false,
+                        'errors' => 'No authenticated user found',
+                        'message' => 'No authenticated user found',
+                    ], 404);
+                }
+             
+                $validateMedicine = Validator::make($request->all(), 
+                [
+                    'medicine_pharmacy_id'=>'required|integer|exists:medicine_pharmacies,id',
+                    'confirmed'=>'string',
+                ]);
+             
+             
+               if($validateMedicine->fails()){
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'خطأ في التحقق',
+                        'errors' => $validateMedicine->errors()
+                    ], 422);
+                }  
+                         
+            $order = MedicinePharmacy::with('medicine')->find($request->medicine_pharmacy_id);
+            
+         
+          if($order)  
+          {  
+            $result=$order->update($validateMedicine->validated());
+            
+          
+          
+            if ($result){
+         
+                return response()->json( [
+                    'status'=>true,
+                    'order'=>$order,
+                    'message'=>"data obtained successfully"
+                   ] , 200);
+            }
+           
+          }
+            else{
+                return response()->json([  
+                    'status' => false,
+                    'message' => 'something went wrong',
+                    ], 204);
+                }
+
+        }
+        catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => $th->getMessage()
+            ], 500);
+        }
+      
+        
     }
     }
 

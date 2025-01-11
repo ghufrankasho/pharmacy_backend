@@ -13,7 +13,10 @@ class Orderdetial extends Model
         'order_id',
        
     ];
-    public function orders(){
+    public function order(){
         return $this->belongsTo(Order::class); 
-     } 
+    }
+    public function medicine(){
+        return $this->belongsTo(Medicine::class)->with('medicinedetials','warehouse'); 
+    } 
 }

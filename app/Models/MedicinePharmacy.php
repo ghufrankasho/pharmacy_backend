@@ -20,6 +20,7 @@ class MedicinePharmacy extends Model
         return $this->belongsTo(Pharmacy::class); 
     } 
     public function medicine(){
-        return $this->belongsTo(Medicine::class)->with('medicinedetials'); 
+        return $this->belongsTo(Medicine::class)->with('medicinedetials','warehouse'); 
     } 
+   
 }

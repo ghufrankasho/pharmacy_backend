@@ -11,12 +11,13 @@ class Order extends Model
     protected $fillable = [
         'pharmacy_id',
         'user_id',
-        'photo'
+        'photo',
+        'confirmed'
        
     ];
     
     public function order_detials(){
-        return $this->hasMany(Orderdetial::class); 
+        return $this->hasMany(Orderdetial::class)->with('medicine'); 
     } 
     public function user(){
         return $this->belongsTo(User::class); 

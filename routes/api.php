@@ -70,10 +70,13 @@ Route::group(['middleware'=>'auth:pharmacy','prefix'=>'pharmacy'],function($rout
     //medicine-pharmacy 
     Route::post('/medicinePharmacy/sendOrder',[MedicinePharmacyController::class,'sendOrder']);
     Route::get('/medicinePharmacy',[MedicinePharmacyController::class,'getOrders']);
-    
+    Route::get('/',[MedicinePharmacyController::class,'showWarehouseOrder']);
     //warehouse
     Route::get('/warehouse',[WarehouseController::class,'get']);
-    // Route::get('/warehouse',[WarehouseController::class,'show']);
+    // order
+
+    Route::post('/',[OrderController::class,'update']);
+   
     //users orders
     Route::get('/user',[OrderController::class,'get']);
     // Route::get('/warehouse',[WarehouseController::class,'show']);
