@@ -9,7 +9,7 @@ use App\Http\Controllers\MedicinedetialController;
 use App\Http\Controllers\MedicinePharmacyController;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\OrderController;
- 
+use App\Http\Controllers\PharmacyController;
 
 /*
 |--------------------------------------------------------------------------
@@ -90,8 +90,8 @@ Route::group(['middleware'=>'auth:user','prefix'=>'user'],function($router){
     Route::get('/orders',[OrderController::class,'show']);
     Route::get('/medicine',[MedicineController::class,'show']);
     
-    // //medicine-pharmacy 
-    // Route::post('/medicinePharmacy/sendOrder',[MedicinePharmacyController::class,'sendOrder']);
+    //  pharmacy 
+    Route::get('/pharmacy',[PharmacyController::class,'index']);
     // Route::get('/medicinePharmacy',[MedicinePharmacyController::class,'getOrders']);
     
     // //warehouse

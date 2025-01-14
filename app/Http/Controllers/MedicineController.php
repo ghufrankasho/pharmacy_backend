@@ -163,8 +163,20 @@ class MedicineController extends Controller
                 {
                     $this->deleteImage($Medicine->photo);
                 }
-                 $Medicine->medicinedetials()->delete();
-           
+                $Medicine->medicinedetials()->delete();
+               $med_pharmacy= $Medicine->medicine_pharmacy()->get();
+               $med_order= $Medicine->order_detials()->get();
+               if(count($med_pharmacy)>0 || count($med_order)>0){
+                return response()->json(
+                    [
+                        'status'=>true,
+                        'data'=>'',
+                        'message'=>"you can not  delete this medicine it exsist in some pharmacy orders"
+                       ]
+                 , 204);
+               }
+             
+               
                 $result= $Medicine->delete();
                 if($result)
                  {

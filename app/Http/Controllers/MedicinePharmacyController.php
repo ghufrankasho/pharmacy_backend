@@ -6,7 +6,7 @@ use App\Models\MedicinePharmacy;
 
 use App\Models\Medicinedetial;
 use App\Models\Medicine;
-use App\Models\Pharmacy;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
