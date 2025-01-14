@@ -297,4 +297,55 @@ class OrderController extends Controller
       
         
     }
+    public function destroy(Request $request){
+        try {  
+             
+            
+            $validate = Validator::make( $request->all(),
+                ['order_id'=>'required|integer|exists:orders,id']);
+            if($validate->fails()){
+            return response()->json([
+                'status' => false,
+               'message' => 'خطأ في التحقق',
+                'errors' => $validate->errors()
+            ], 422);}
+          
+            $order=Order::find($request->order_id);
+           
+            if($order )
+            { 
+                if($order->photo!=null) 
+                {
+                    $this->deleteImage($order->photo);
+                }
+                $order->order_detials()->delete();
+                
+                $result= $order->delete();
+                if($result)
+                 {
+                  
+                   
+             
+                return response()->json(
+                    [
+                        'status'=>true,
+                        'data'=>'',
+                        'message'=>"data deleted successfully"
+                       ]
+                 , 200);}
+                
+            }
+    
+              
+                return response()->json([  
+                    'status' => false,
+                    'message' => 'something went wrong',
+                    ], 204);
+          }
+          catch (ValidationException $e) {
+              return response()->json(['errors' => $e->errors()], 422);
+          } catch (\Exception $e) {
+              return response()->json(['message' => 'An error occurred while deleting the order.'], 500);
+          }
+    }
 }

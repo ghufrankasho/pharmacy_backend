@@ -88,10 +88,11 @@ Route::group(['middleware'=>'auth:user','prefix'=>'user'],function($router){
     //order
     Route::post('/sendOrders',[OrderController::class,'store']);
     Route::get('/orders',[OrderController::class,'show']);
+    Route::delete('/orders',[OrderController::class,'destroy']);
     Route::get('/medicine',[MedicineController::class,'show']);
     
     //  pharmacy 
-    Route::get('/pharmacy',[PharmacyController::class,'index']);
+    Route::get('/pharmacy',[PharmacyController::class,'get']);
     // Route::get('/medicinePharmacy',[MedicinePharmacyController::class,'getOrders']);
     
     // //warehouse
